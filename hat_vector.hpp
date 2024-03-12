@@ -11,10 +11,13 @@ public:
     hat_vector();
     ~hat_vector();
     
+    // TODO: Copy constructor and assignment operator
+    
     T& operator[](std::size_t pos);
     const T& operator[](std::size_t pos) const;
 
     void push_back(const T& element);
+    std::size_t size() const;
     
 private:
     void resize();
@@ -94,6 +97,12 @@ void hat_vector<T, Allocator>::push_back(const T& element)
     // Set the element
     m_data[m_size >> m_power][m_size & ((1 << m_power) - 1)] = element;
     ++m_size;
+}
+
+template <typename T, typename Allocator>
+std::size_t hat_vector<T, Allocator>::size() const
+{
+    return m_size;
 }
 
 template <typename T, typename Allocator>

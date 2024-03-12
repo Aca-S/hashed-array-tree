@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < 10000; i++)
         v.push_back(i);
         
-    for (int i = 0; i < 10000; i++)
+    for (int i = 0; i < v.size(); i++)
         std::cout << v[i] << std::endl;
 
     return 0;
