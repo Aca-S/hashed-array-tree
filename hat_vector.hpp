@@ -5,6 +5,12 @@
 #include <memory>
 #include <cassert>
 
+template <typename T, typename Allocator>
+class hat_vector;
+
+template <typename T, typename Allocator>
+void swap(hat_vector<T, Allocator> &first, hat_vector<T, Allocator> &second);
+
 template <typename T, typename Allocator = std::allocator<T>>
 class hat_vector
 {
@@ -13,14 +19,15 @@ public:
     ~hat_vector();
     
     hat_vector(const hat_vector<T, Allocator> &other);
-    
-    // TODO: Copy constructor and assignment operator
+    hat_vector<T, Allocator>& operator=(hat_vector<T, Allocator> other);
     
     T& operator[](std::size_t pos);
     const T& operator[](std::size_t pos) const;
 
     void push_back(const T& element);
     std::size_t size() const;
+    
+    friend void swap<>(hat_vector<T, Allocator> &first, hat_vector<T, Allocator> &second);
     
 private:
     void resize_to_higher(std::size_t new_power);
@@ -33,6 +40,16 @@ private:
     std::size_t m_capacity = 0;
     std::size_t m_size = 0;
 };
+
+template <typename T, typename Allocator>
+void swap(hat_vector<T, Allocator> &first, hat_vector<T, Allocator> &second)
+{
+    std::swap(first.m_allocator, second.m_allocator);
+    std::swap(first.m_data, second.m_data);
+    std::swap(first.m_power, second.m_power);
+    std::swap(first.m_capacity, second.m_capacity);
+    std::swap(first.m_size, second.m_size);
+}
 
 template <typename T, typename Allocator>
 hat_vector<T, Allocator>::hat_vector()
@@ -58,6 +75,13 @@ hat_vector<T, Allocator>::hat_vector(const hat_vector<T, Allocator> &other)
         m_data[i] = m_allocator.allocate(bucket_size);
         std::uninitialized_copy_n(other.m_data[i], bucket_size, m_data[i]);
     }
+}
+
+template <typename T, typename Allocator>
+hat_vector<T, Allocator>& hat_vector<T, Allocator>::operator=(hat_vector<T, Allocator> other)
+{
+    swap(*this, other);
+    return *this;
 }
 
 template <typename T, typename Allocator>
