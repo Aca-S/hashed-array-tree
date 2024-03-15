@@ -10,9 +10,11 @@ int main(int argc, char *argv[])
     for (int i = 0; i < 1'000'000; i++)
         v.push_back(i);
         
+    hat_vector<int> v2(v);
+        
     int sum = 0;
-    for (int i = 0; i < v.size(); i++)
-        sum += v[i];
+    for (int i = 0; i < v2.size(); i++)
+        sum += v2[i];
         
     std::cout << sum << std::endl;
 

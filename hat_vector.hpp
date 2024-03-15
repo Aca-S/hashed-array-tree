@@ -12,6 +12,8 @@ public:
     hat_vector();
     ~hat_vector();
     
+    hat_vector(const hat_vector<T, Allocator> &other);
+    
     // TODO: Copy constructor and assignment operator
     
     T& operator[](std::size_t pos);
@@ -42,6 +44,20 @@ template <typename T, typename Allocator>
 hat_vector<T, Allocator>::~hat_vector()
 {
     deallocate();
+}
+
+template <typename T, typename Allocator>
+hat_vector<T, Allocator>::hat_vector(const hat_vector<T, Allocator> &other)
+    : m_allocator(other.m_allocator), m_power(other.m_power), m_capacity(other.m_capacity), m_size(other.m_size)
+{
+    const std::size_t bucket_size = 1 << m_power;
+    const std::size_t buckets_to_alloc = m_capacity == 0 ? 0 : 1 + (m_capacity - 1 >> m_power);
+    
+    m_data = new T*[bucket_size];
+    for (std::size_t i = 0; i < buckets_to_alloc; ++i) {
+        m_data[i] = m_allocator.allocate(bucket_size);
+        std::uninitialized_copy_n(other.m_data[i], bucket_size, m_data[i]);
+    }
 }
 
 template <typename T, typename Allocator>
