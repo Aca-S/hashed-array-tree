@@ -27,6 +27,8 @@ public:
     const T& operator[](std::size_t pos) const;
 
     void push_back(const T& element);
+    void pop_back();
+    
     std::size_t size() const;
     
     friend void swap<>(hat_vector<T, Allocator> &first, hat_vector<T, Allocator> &second);
@@ -154,6 +156,13 @@ void hat_vector<T, Allocator>::push_back(const T& element)
     // Set the element
     m_data[m_size >> m_power][m_size & ((1 << m_power) - 1)] = element;
     ++m_size;
+}
+
+template <typename T, typename Allocator>
+void hat_vector<T, Allocator>::pop_back()
+{
+    --m_size;
+    m_data[m_size >> m_power][m_size & ((1 << m_power) - 1)].~T();
 }
 
 template <typename T, typename Allocator>
