@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <cassert>
 
 template <typename T, typename Allocator = std::allocator<T>>
 class hat_vector
@@ -20,7 +21,7 @@ public:
     std::size_t size() const;
     
 private:
-    void resize();
+    void resize_to_higher(std::size_t new_power);
     void deallocate();
     void allocate_bucket();
 
@@ -44,22 +45,29 @@ hat_vector<T, Allocator>::~hat_vector()
 }
 
 template <typename T, typename Allocator>
-void hat_vector<T, Allocator>::resize()
+void hat_vector<T, Allocator>::resize_to_higher(std::size_t new_power)
 {
+    assert(new_power > m_power && "hat_vector<T, Allocator>::allocate_higher requires a power higher than hat_vector<T, Allocator>::m_power");
+    
     const std::size_t old_bucket_size = 1 << m_power;
-    const std::size_t new_bucket_size = old_bucket_size << 1;
-    const std::size_t buckets_to_fill = old_bucket_size >> 1;
+    const std::size_t new_bucket_size = 1 << new_power;
+    
+    const std::size_t buckets_to_alloc = m_size == 0 ? 0 : 1 + (m_size - 1 >> new_power);
     
     T** new_data = new T*[new_bucket_size];
-    for (std::size_t i = 0; i < buckets_to_fill; ++i) {
+    for (std::size_t i = 0; i < buckets_to_alloc; ++i) {
         new_data[i] = m_allocator.allocate(new_bucket_size);
-        std::uninitialized_copy_n(m_data[i << 1], old_bucket_size, new_data[i]);
-        std::uninitialized_copy_n(m_data[(i << 1) + 1], old_bucket_size, new_data[i] + old_bucket_size);
+    }
+    
+    for (std::size_t copied = 0; copied < m_size; copied += old_bucket_size) {
+        std::uninitialized_copy_n(m_data[copied >> m_power], old_bucket_size, new_data[copied >> new_power] + (copied & (new_bucket_size - 1)));
     }
     
     deallocate();
+    
     m_data = new_data;
-    ++m_power;
+    m_power = new_power;
+    m_capacity = buckets_to_alloc << new_power;
 }
 
 template <typename T, typename Allocator>
@@ -86,7 +94,7 @@ void hat_vector<T, Allocator>::push_back(const T& element)
 {
     // Resize if needed
     if (m_size == 1 << m_power << m_power) {
-        resize();
+        resize_to_higher(m_power + 1);
     }
     
     // Allocate another bucket if needed
