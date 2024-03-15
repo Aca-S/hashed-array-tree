@@ -13,7 +13,9 @@ int main(int argc, char *argv[])
     hat_vector<int> v2(v);
     hat_vector<int> v3;
     v3 = v2;
-        
+    
+    swap(v3, v);
+    
     int sum = 0;
     for (int i = 0; i < v3.size(); i++)
         sum += v3[i];

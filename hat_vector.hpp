@@ -21,6 +21,8 @@ public:
     hat_vector(const hat_vector<T, Allocator> &other);
     hat_vector<T, Allocator>& operator=(hat_vector<T, Allocator> other);
     
+    hat_vector(hat_vector<T, Allocator> &&other);
+    
     T& operator[](std::size_t pos);
     const T& operator[](std::size_t pos) const;
 
@@ -82,6 +84,13 @@ hat_vector<T, Allocator>& hat_vector<T, Allocator>::operator=(hat_vector<T, Allo
 {
     swap(*this, other);
     return *this;
+}
+
+template <typename T, typename Allocator>
+hat_vector<T, Allocator>::hat_vector(hat_vector<T, Allocator> &&other)
+    : hat_vector<T, Allocator>()
+{
+    swap(*this, other);
 }
 
 template <typename T, typename Allocator>
