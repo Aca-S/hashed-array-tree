@@ -30,6 +30,7 @@ public:
     void pop_back();
     
     std::size_t size() const;
+    std::size_t capacity() const;
     
     friend void swap<>(hat_vector<T, Allocator> &first, hat_vector<T, Allocator> &second);
     
@@ -169,6 +170,12 @@ template <typename T, typename Allocator>
 std::size_t hat_vector<T, Allocator>::size() const
 {
     return m_size;
+}
+
+template <typename T, typename Allocator>
+std::size_t hat_vector<T, Allocator>::capacity() const
+{
+    return m_capacity;
 }
 
 template <typename T, typename Allocator>
