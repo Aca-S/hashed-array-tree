@@ -12,19 +12,6 @@ int main(int argc, char *argv[])
         v.push_back(i);
         
     std::sort(v.begin(), v.end(), std::greater<>{});
-    
-    for (auto x : v) {
-        std::cout << x << std::endl;
-    }
-    
-    /*
-    int sum = 0;
-    for (auto it = v.rbegin(); it != v.rend(); it++) {
-        sum += *it;
-    }
-        
-    std::cout << sum << std::endl;
-    */
 
     return 0;
 }

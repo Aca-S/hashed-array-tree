@@ -236,33 +236,33 @@ public:
     
     iterator(hat_vector<T, Allocator> &internal, std::size_t pos);
     
-    reference operator*() const;
-    pointer operator->();
-    reference operator[](difference_type n);
+    inline reference operator*() const { return (*m_internal)[m_pos]; };
+    inline pointer operator->() { return &(*m_internal)[m_pos]; };
+    inline reference operator[](difference_type n) { return (*m_internal)[m_pos + n]; };
     
-    iterator& operator++();
-    iterator operator++(int);
+    inline iterator& operator++() { ++m_pos; return *this; };
+    inline iterator operator++(int) { iterator copy = *this; ++m_pos; return copy; };
     
-    iterator& operator--();
-    iterator operator--(int);
+    inline iterator& operator--() { --m_pos; return *this; };
+    inline iterator operator--(int) { iterator copy = *this; --m_pos; return copy; };
     
-    iterator& operator +=(difference_type n);
-    iterator& operator -=(difference_type n);
+    inline iterator& operator +=(difference_type n) { m_pos += n; return *this; };
+    inline iterator& operator -=(difference_type n) { m_pos -= n; return *this; };
     
-    friend iterator operator+(const iterator &left, difference_type n) { return iterator(*left.m_internal, left.m_pos + n); }
-    friend iterator operator+(difference_type n, const iterator &right) { return iterator(*right.m_internal, right.m_pos + n); }
+    inline friend iterator operator+(const iterator &left, difference_type n) { return iterator(*left.m_internal, left.m_pos + n); }
+    inline friend iterator operator+(difference_type n, const iterator &right) { return iterator(*right.m_internal, right.m_pos + n); }
     
-    friend iterator operator-(const iterator &left, difference_type n) { return iterator(*left.m_internal, left.m_pos - n); }
-    friend difference_type operator-(const iterator &left, const iterator &right) { return static_cast<difference_type>(left.m_pos) - static_cast<difference_type>(right.m_pos); } 
+    inline friend iterator operator-(const iterator &left, difference_type n) { return iterator(*left.m_internal, left.m_pos - n); }
+    inline friend difference_type operator-(const iterator &left, const iterator &right) { return static_cast<difference_type>(left.m_pos) - static_cast<difference_type>(right.m_pos); } 
     
-    friend bool operator==(const iterator &left, const iterator &right) { return left.m_pos == right.m_pos; }
-    friend bool operator!=(const iterator &left, const iterator &right) { return left.m_pos != right.m_pos; }
+    inline friend bool operator==(const iterator &left, const iterator &right) { return left.m_pos == right.m_pos; }
+    inline friend bool operator!=(const iterator &left, const iterator &right) { return left.m_pos != right.m_pos; }
     
-    friend bool operator<(const iterator &left, const iterator &right) { return left.m_pos < right.m_pos; }
-    friend bool operator>(const iterator &left, const iterator &right) { return left.m_pos > right.m_pos; }
+    inline friend bool operator<(const iterator &left, const iterator &right) { return left.m_pos < right.m_pos; }
+    inline friend bool operator>(const iterator &left, const iterator &right) { return left.m_pos > right.m_pos; }
     
-    friend bool operator<=(const iterator &left, const iterator &right) { return left.m_pos <= right.m_pos; }
-    friend bool operator>=(const iterator &left, const iterator &right) { return left.m_pos >= right.m_pos; }
+    inline friend bool operator<=(const iterator &left, const iterator &right) { return left.m_pos <= right.m_pos; }
+    inline friend bool operator>=(const iterator &left, const iterator &right) { return left.m_pos >= right.m_pos; }
     
 private:
     hat_vector<T, Allocator> *m_internal;
@@ -273,68 +273,6 @@ template <typename T, typename Allocator>
 hat_vector<T, Allocator>::iterator::iterator(hat_vector<T, Allocator> &internal, std::size_t pos)
     : m_internal(&internal), m_pos(pos)
 {
-}
-
-template <typename T, typename Allocator>
-typename hat_vector<T, Allocator>::iterator::reference hat_vector<T, Allocator>::iterator::operator*() const
-{
-    return (*m_internal)[m_pos];
-}
-
-template <typename T, typename Allocator>
-typename hat_vector<T, Allocator>::iterator::pointer hat_vector<T, Allocator>::iterator::operator->()
-{
-    return &(*m_internal)[m_pos];
-}
-
-template <typename T, typename Allocator>
-typename hat_vector<T, Allocator>::iterator::reference hat_vector<T, Allocator>::iterator::operator[](difference_type n)
-{
-    return (*m_internal)[m_pos + n];
-}
-
-template <typename T, typename Allocator>
-typename hat_vector<T, Allocator>::iterator& hat_vector<T, Allocator>::iterator::operator++()
-{
-    ++m_pos;
-    return *this;
-}
-
-template <typename T, typename Allocator>
-typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::iterator::operator++(int)
-{
-    iterator copy = *this;
-    ++m_pos;
-    return copy;
-}
-
-template <typename T, typename Allocator>
-typename hat_vector<T, Allocator>::iterator& hat_vector<T, Allocator>::iterator::operator--()
-{
-    --m_pos;
-    return *this;
-}
-
-template <typename T, typename Allocator>
-typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::iterator::operator--(int)
-{
-    iterator copy = *this;
-    --m_pos;
-    return copy;
-}
-
-template <typename T, typename Allocator>
-typename hat_vector<T, Allocator>::iterator& hat_vector<T, Allocator>::iterator::operator+=(difference_type n)
-{
-    m_pos += n;
-    return *this;
-}
-
-template <typename T, typename Allocator>
-typename hat_vector<T, Allocator>::iterator& hat_vector<T, Allocator>::iterator::operator-=(difference_type n)
-{
-    m_pos -= n;
-    return *this;
 }
 
 #endif // HAT_VECTOR_HPP
