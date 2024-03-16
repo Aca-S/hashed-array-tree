@@ -9,19 +9,11 @@ int main(int argc, char *argv[])
     
     for (int i = 0; i < 1'000'000; i++)
         v.push_back(i);
-        
-    hat_vector<int> v2(v);
-    hat_vector<int> v3;
-    v3 = v2;
-    
-    swap(v3, v);
-    
-    for (int i = 0; i < 1'000'000; i++)
-        v3.pop_back();
     
     int sum = 0;
-    for (int i = 0; i < v3.size(); i++)
-        sum += v3[i];
+    for (auto it = v.rbegin(); it != v.rend(); it++) {
+        sum += *it;
+    }
         
     std::cout << sum << std::endl;
 
