@@ -5,6 +5,7 @@
 #include <memory>
 #include <cassert>
 #include <iterator>
+#include <type_traits>
 
 template <typename T, typename Allocator>
 class hat_vector;
@@ -15,7 +16,29 @@ void swap(hat_vector<T, Allocator> &first, hat_vector<T, Allocator> &second);
 template <typename T, typename Allocator = std::allocator<T>>
 class hat_vector
 {
+private:
+    template <bool Const>
+    class iterator_impl;
+    
 public:
+    using value_type = T;
+    using allocator_type = Allocator;
+    
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    
+    using reference = value_type&;
+    using const_reference = const value_type&;
+    
+    using pointer = typename std::allocator_traits<Allocator>::pointer;
+    using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
+    
+    using iterator = iterator_impl<false>;
+    using const_iterator = iterator_impl<true>;
+    
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
     hat_vector();
     ~hat_vector();
     
@@ -36,14 +59,17 @@ public:
     
     friend void swap<>(hat_vector<T, Allocator> &first, hat_vector<T, Allocator> &second);
     
-    class iterator;
-    using reverse_iterator = std::reverse_iterator<iterator>;
-    
     iterator begin();
     iterator end();
     
+    const_iterator cbegin();
+    const_iterator cend();
+    
     reverse_iterator rbegin();
     reverse_iterator rend();
+    
+    const_reverse_iterator crbegin();
+    const_reverse_iterator crend();
     
 private:
     void resize_to_higher(std::size_t new_power);
@@ -220,6 +246,18 @@ typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::end()
 }
 
 template <typename T, typename Allocator>
+typename hat_vector<T, Allocator>::const_iterator hat_vector<T, Allocator>::cbegin()
+{
+    return const_iterator(*this, 0);
+}
+
+template <typename T, typename Allocator>
+typename hat_vector<T, Allocator>::const_iterator hat_vector<T, Allocator>::cend()
+{
+    return const_iterator(*this, m_size);
+}
+
+template <typename T, typename Allocator>
 typename hat_vector<T, Allocator>::reverse_iterator hat_vector<T, Allocator>::rbegin()
 {
     return hat_vector<T, Allocator>::reverse_iterator(end());
@@ -232,54 +270,72 @@ typename hat_vector<T, Allocator>::reverse_iterator hat_vector<T, Allocator>::re
 }
 
 template <typename T, typename Allocator>
-class hat_vector<T, Allocator>::iterator
+typename hat_vector<T, Allocator>::const_reverse_iterator hat_vector<T, Allocator>::crbegin()
+{
+    return hat_vector<T, Allocator>::const_reverse_iterator(cend());
+}
+
+template <typename T, typename Allocator>
+typename hat_vector<T, Allocator>::const_reverse_iterator hat_vector<T, Allocator>::crend()
+{
+    return hat_vector<T, Allocator>::const_reverse_iterator(cbegin());
+}
+
+template <typename T, typename Allocator>
+template <bool Const>
+class hat_vector<T, Allocator>::iterator_impl
 {
 public:
     using iterator_category = std::random_access_iterator_tag;
-    using difference_type = std::ptrdiff_t;
-    using value_type = T;
-    using pointer = T*;
-    using reference = T&;
+    using difference_type = hat_vector<T, Allocator>::difference_type;
     
-    iterator(hat_vector<T, Allocator> &internal, std::size_t pos);
+    using value_type = T;
+    using pointer = std::conditional_t<Const, const T*, T*>;
+    using reference = std::conditional_t<Const, const T&, T&>;
+    
+    iterator_impl(hat_vector<T, Allocator> &internal, std::size_t pos)
+        : m_internal(&internal), m_pos(pos)
+    {
+    }
     
     inline reference operator*() const { return (*m_internal)[m_pos]; };
     inline pointer operator->() { return &(*m_internal)[m_pos]; };
     inline reference operator[](difference_type n) { return (*m_internal)[m_pos + n]; };
     
-    inline iterator& operator++() { ++m_pos; return *this; };
-    inline iterator operator++(int) { iterator copy = *this; ++m_pos; return copy; };
+    inline iterator_impl& operator++() { ++m_pos; return *this; };
+    inline iterator_impl operator++(int) { iterator_impl copy = *this; ++m_pos; return copy; };
     
-    inline iterator& operator--() { --m_pos; return *this; };
-    inline iterator operator--(int) { iterator copy = *this; --m_pos; return copy; };
+    inline iterator_impl& operator--() { --m_pos; return *this; };
+    inline iterator_impl operator--(int) { iterator_impl copy = *this; --m_pos; return copy; };
     
-    inline iterator& operator +=(difference_type n) { m_pos += n; return *this; };
-    inline iterator& operator -=(difference_type n) { m_pos -= n; return *this; };
+    inline iterator_impl& operator +=(difference_type n) { m_pos += n; return *this; };
+    inline iterator_impl& operator -=(difference_type n) { m_pos -= n; return *this; };
     
-    inline friend iterator operator+(const iterator &left, difference_type n) { return iterator(*left.m_internal, left.m_pos + n); }
-    inline friend iterator operator+(difference_type n, const iterator &right) { return iterator(*right.m_internal, right.m_pos + n); }
+    inline friend iterator_impl operator+(const iterator_impl &left, difference_type n) { return iterator_impl(*left.m_internal, left.m_pos + n); }
+    inline friend iterator_impl operator+(difference_type n, const iterator_impl &right) { return iterator_impl(*right.m_internal, right.m_pos + n); }
     
-    inline friend iterator operator-(const iterator &left, difference_type n) { return iterator(*left.m_internal, left.m_pos - n); }
-    inline friend difference_type operator-(const iterator &left, const iterator &right) { return static_cast<difference_type>(left.m_pos) - static_cast<difference_type>(right.m_pos); } 
+    inline friend iterator_impl operator-(const iterator_impl &left, difference_type n)
+    {
+        return iterator_impl(*left.m_internal, left.m_pos - n);
+    }
     
-    inline friend bool operator==(const iterator &left, const iterator &right) { return left.m_pos == right.m_pos; }
-    inline friend bool operator!=(const iterator &left, const iterator &right) { return left.m_pos != right.m_pos; }
+    inline friend difference_type operator-(const iterator_impl &left, const iterator_impl &right)
+    {
+        return static_cast<difference_type>(left.m_pos) - static_cast<difference_type>(right.m_pos);
+    } 
     
-    inline friend bool operator<(const iterator &left, const iterator &right) { return left.m_pos < right.m_pos; }
-    inline friend bool operator>(const iterator &left, const iterator &right) { return left.m_pos > right.m_pos; }
+    inline friend bool operator==(const iterator_impl &left, const iterator_impl &right) { return left.m_pos == right.m_pos; }
+    inline friend bool operator!=(const iterator_impl &left, const iterator_impl &right) { return left.m_pos != right.m_pos; }
     
-    inline friend bool operator<=(const iterator &left, const iterator &right) { return left.m_pos <= right.m_pos; }
-    inline friend bool operator>=(const iterator &left, const iterator &right) { return left.m_pos >= right.m_pos; }
+    inline friend bool operator<(const iterator_impl &left, const iterator_impl &right) { return left.m_pos < right.m_pos; }
+    inline friend bool operator>(const iterator_impl &left, const iterator_impl &right) { return left.m_pos > right.m_pos; }
+    
+    inline friend bool operator<=(const iterator_impl &left, const iterator_impl &right) { return left.m_pos <= right.m_pos; }
+    inline friend bool operator>=(const iterator_impl &left, const iterator_impl &right) { return left.m_pos >= right.m_pos; }
     
 private:
     hat_vector<T, Allocator> *m_internal;
     std::size_t m_pos;
 };
-
-template <typename T, typename Allocator>
-hat_vector<T, Allocator>::iterator::iterator(hat_vector<T, Allocator> &internal, std::size_t pos)
-    : m_internal(&internal), m_pos(pos)
-{
-}
 
 #endif // HAT_VECTOR_HPP
