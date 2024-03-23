@@ -32,6 +32,7 @@ public:
     
     std::size_t size() const;
     std::size_t capacity() const;
+    bool empty() const;
     
     friend void swap<>(hat_vector<T, Allocator> &first, hat_vector<T, Allocator> &second);
     
@@ -186,6 +187,12 @@ template <typename T, typename Allocator>
 std::size_t hat_vector<T, Allocator>::capacity() const
 {
     return m_capacity;
+}
+
+template <typename T, typename Allocator>
+bool hat_vector<T, Allocator>::empty() const
+{
+    return m_size == 0;
 }
 
 template <typename T, typename Allocator>
