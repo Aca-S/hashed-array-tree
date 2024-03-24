@@ -17,7 +17,7 @@ void swap(hat_vector<T, Allocator> &first, hat_vector<T, Allocator> &second);
 template <typename T, typename Allocator = std::allocator<T>>
 class hat_vector
 {
-public:
+private:
     template <bool Const>
     class iterator_impl;
     
@@ -58,6 +58,8 @@ public:
     
     iterator erase(const_iterator first, const_iterator last);
     iterator erase(const_iterator pos);
+    
+    void clear();
     
     std::size_t size() const;
     std::size_t capacity() const;
@@ -262,6 +264,12 @@ template <typename T, typename Allocator>
 typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::erase(const_iterator pos)
 {
     return erase(pos, pos + 1);
+}
+
+template <typename T, typename Allocator>
+void hat_vector<T, Allocator>::clear()
+{
+    erase(cbegin(), cend());
 }
 
 template <typename T, typename Allocator>
