@@ -6,6 +6,7 @@
 #include <cassert>
 #include <iterator>
 #include <type_traits>
+#include <algorithm>
 
 template <typename T, typename Allocator>
 class hat_vector;
@@ -52,6 +53,8 @@ public:
 
     void push_back(const T& element);
     void pop_back();
+    
+    iterator insert(const_iterator pos, std::size_t count, const T& value);
     
     std::size_t size() const;
     std::size_t capacity() const;
@@ -204,6 +207,40 @@ void hat_vector<T, Allocator>::pop_back()
 }
 
 template <typename T, typename Allocator>
+typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::insert(hat_vector<T, Allocator>::const_iterator pos, std::size_t count, const T& value)
+{
+    const std::size_t new_size = m_size + count;
+    if (new_size == 0) {
+        return begin();
+    }
+    
+    std::size_t new_power = 0;
+    for (std::size_t i = new_size - 1; i != 0; i >>= 2) {
+        ++new_power;
+    }
+    
+    if (new_power > m_power) {
+        resize_to_higher(new_power);
+    }
+    
+    while (new_size > m_capacity) {
+        allocate_bucket();
+    }
+    
+    std::size_t offset = pos - cbegin();
+    
+    // Right shift simulation
+    std::uninitialized_copy(crbegin(), crend() - offset, rbegin() - count);
+    for (auto it = begin() + offset; it != begin() + offset + count; ++it) {
+        *it = value;
+    }
+    
+    m_size = new_size;
+    
+    return begin() + offset;
+}
+
+template <typename T, typename Allocator>
 std::size_t hat_vector<T, Allocator>::size() const
 {
     return m_size;
@@ -287,8 +324,8 @@ class hat_vector<T, Allocator>::iterator_impl
 {
 public:
     using iterator_category = std::random_access_iterator_tag;
-    using difference_type = hat_vector<T, Allocator>::difference_type;
     
+    using difference_type = hat_vector<T, Allocator>::difference_type;
     using value_type = hat_vector<T, Allocator>::value_type;
     using pointer = std::conditional_t<Const, hat_vector<T, Allocator>::const_pointer, hat_vector<T, Allocator>::pointer>;
     using reference = std::conditional_t<Const, hat_vector<T, Allocator>::const_reference, hat_vector<T, Allocator>::reference>;

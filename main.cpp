@@ -8,16 +8,14 @@ int main(int argc, char *argv[])
 {
     hat_vector<int> v;
     
-    for (int i = 0; i < 1'000; i++)
+    for (int i = 0; i < 10; i++) {
         v.push_back(i);
-        
-    auto it = v.begin();
-    *it = 4;
-        
-    std::sort(v.begin(), v.end(), std::greater<>{});
+    }
     
-    for (auto it = v.crbegin(); it != v.crend(); it++)
-        std::cout << *it << std::endl;
+    v.insert(v.cbegin() + 8, 9, 42);
+    
+    std::copy(v.cbegin(), v.cend(), std::ostream_iterator<int>(std::cout, " "));
+    std::cout << std::endl;
 
     return 0;
 }
