@@ -289,9 +289,9 @@ public:
     using iterator_category = std::random_access_iterator_tag;
     using difference_type = hat_vector<T, Allocator>::difference_type;
     
-    using value_type = T;
-    using pointer = std::conditional_t<Const, const T*, T*>;
-    using reference = std::conditional_t<Const, const T&, T&>;
+    using value_type = hat_vector<T, Allocator>::value_type;
+    using pointer = std::conditional_t<Const, hat_vector<T, Allocator>::const_pointer, hat_vector<T, Allocator>::pointer>;
+    using reference = std::conditional_t<Const, hat_vector<T, Allocator>::const_reference, hat_vector<T, Allocator>::reference>;
     
     iterator_impl(hat_vector<T, Allocator> &internal, std::size_t pos)
         : m_internal(&internal), m_pos(pos)
