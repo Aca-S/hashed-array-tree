@@ -17,7 +17,7 @@ void swap(hat_vector<T, Allocator> &first, hat_vector<T, Allocator> &second);
 template <typename T, typename Allocator = std::allocator<T>>
 class hat_vector
 {
-private:
+public:
     template <bool Const>
     class iterator_impl;
     
@@ -354,6 +354,12 @@ public:
     using pointer = std::conditional_t<Const, hat_vector<T, Allocator>::const_pointer, hat_vector<T, Allocator>::pointer>;
     using reference = std::conditional_t<Const, hat_vector<T, Allocator>::const_reference, hat_vector<T, Allocator>::reference>;
     
+    template <bool C = Const, std::enable_if_t<C, int> = false>
+    iterator_impl(const iterator_impl<false> &other)
+        : m_internal(other.m_internal), m_pos(other.m_pos)
+    {
+    }
+    
     iterator_impl(hat_vector<T, Allocator> &internal, std::size_t pos)
         : m_internal(&internal), m_pos(pos)
     {
@@ -395,6 +401,8 @@ public:
     inline friend bool operator>=(const iterator_impl &left, const iterator_impl &right) { return left.m_pos >= right.m_pos; }
     
 private:
+    friend iterator_impl<true>;
+
     hat_vector<T, Allocator> *m_internal;
     std::size_t m_pos;
 };
