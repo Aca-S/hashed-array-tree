@@ -56,6 +56,9 @@ public:
     
     iterator insert(const_iterator pos, std::size_t count, const T& value);
     
+    iterator erase(const_iterator first, const_iterator last);
+    iterator erase(const_iterator pos);
+    
     std::size_t size() const;
     std::size_t capacity() const;
     bool empty() const;
@@ -238,6 +241,27 @@ typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::insert(hat
     m_size = new_size;
     
     return begin() + offset;
+}
+
+template <typename T, typename Allocator>
+typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::erase(const_iterator first, const_iterator last)
+{
+    std::size_t erased = std::distance(first, last);
+
+    iterator nc_first = begin() + (first - cbegin());
+    iterator nc_last = begin() + (last - cbegin());
+
+    std::uninitialized_copy(last, cend(), nc_first);
+        
+    m_size -= erased;
+    
+    return nc_first;
+}
+
+template <typename T, typename Allocator>
+typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::erase(const_iterator pos)
+{
+    return erase(pos, pos + 1);
 }
 
 template <typename T, typename Allocator>

@@ -16,6 +16,12 @@ int main(int argc, char *argv[])
     
     std::copy(v.cbegin(), v.cend(), std::ostream_iterator<int>(std::cout, " "));
     std::cout << std::endl;
+    
+    v.erase(v.cbegin() + 2, v.cend() - 1);
+    v.erase(v.cbegin() + 1);
+    
+    std::copy(v.cbegin(), v.cend(), std::ostream_iterator<int>(std::cout, " "));
+    std::cout << std::endl;
 
     return 0;
 }
