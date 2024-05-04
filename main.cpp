@@ -8,15 +8,12 @@ int main(int argc, char *argv[])
 {
     hat_vector<int> v;
         
-    v.reserve(128);
-    for (int i = 0; i < 128; i++) {
-        v.push_back(7);
+    v.reserve(1000000);
+    for (int i = 0; i < 1000000; i++) {
+        v.push_back(i);
     }
     
-    std::cout << v.size() << std::endl;
-    
-    std::copy(v.cbegin(), v.cend(), std::ostream_iterator<int>(std::cout, " "));
-    std::cout << std::endl;
+    std::sort(v.begin(), v.end());
 
     return 0;
 }

@@ -241,13 +241,10 @@ typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::insert(hat
         return begin();
     }
     
-    std::size_t new_power = 0;
-    for (std::size_t i = new_size - 1; i != 0; i >>= 2) {
-        ++new_power;
-    }
+    std::size_t required_power = smallest_power_of_two_to_hold(new_size);
     
-    if (new_power > m_power) {
-        resize_to_higher(new_power);
+    if (required_power > m_power) {
+        resize_to_higher(required_power);
     }
     
     while (new_size > m_capacity) {
