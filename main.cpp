@@ -7,18 +7,13 @@
 int main(int argc, char *argv[])
 {
     hat_vector<int> v;
-    
-    for (int i = 0; i < 10; i++) {
-        v.push_back(i);
+        
+    v.reserve(128);
+    for (int i = 0; i < 128; i++) {
+        v.push_back(7);
     }
     
-    v.insert(v.cbegin() + 8, 9, 42);
-    
-    std::copy(v.cbegin(), v.cend(), std::ostream_iterator<int>(std::cout, " "));
-    std::cout << std::endl;
-    
-    v.erase(v.begin() + 2, v.end() - 1);
-    v.erase(v.begin() + 1);
+    std::cout << v.size() << std::endl;
     
     std::copy(v.cbegin(), v.cend(), std::ostream_iterator<int>(std::cout, " "));
     std::cout << std::endl;

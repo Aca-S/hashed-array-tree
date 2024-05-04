@@ -65,6 +65,8 @@ public:
     std::size_t capacity() const;
     bool empty() const;
     
+    void reserve(std::size_t new_capacity);
+    
     friend void swap<>(hat_vector<T, Allocator> &first, hat_vector<T, Allocator> &second);
     
     iterator begin();
@@ -90,6 +92,26 @@ private:
     std::size_t m_capacity = 0;
     std::size_t m_size = 0;
 };
+
+namespace
+{
+    std::size_t smallest_power_of_two_to_hold(std::size_t n)
+    {
+        if (n == 0) {
+            return 0;
+        }
+        
+        std::size_t power = 0;
+        
+        --n;
+        while (n > 0) {
+            n >>= 1;
+            ++power;
+        }
+        
+        return power;
+    }
+}
 
 template <typename T, typename Allocator>
 void swap(hat_vector<T, Allocator> &first, hat_vector<T, Allocator> &second)
@@ -288,6 +310,23 @@ template <typename T, typename Allocator>
 bool hat_vector<T, Allocator>::empty() const
 {
     return m_size == 0;
+}
+
+template <typename T, typename Allocator>
+void hat_vector<T, Allocator>::reserve(std::size_t new_capacity)
+{
+    if (new_capacity <= m_capacity) {
+        return;
+    }
+    
+    std::size_t required_power = smallest_power_of_two_to_hold(new_capacity);
+    if (required_power > m_power) {
+        resize_to_higher(required_power);
+    }
+    
+    while (m_capacity < new_capacity) {
+        allocate_bucket();
+    }
 }
 
 template <typename T, typename Allocator>
