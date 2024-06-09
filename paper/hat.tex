@@ -30,4 +30,30 @@
 
 \section{Uvod}
 
+Dinamički nizovi, zbog svoje mogućnosti brzog dodavanja elemenata na kraj, kao i brzog pristupa elementima po indeksu, predstavljaju verovatno najkorišćeniju strukturu podataka u implementaciji velikog broja algoritama, ali i osnovni gradivni element velikog broja drugih struktura podataka (npr. u implementaciji strukture steka ili reda). Iz ovog razloga, dinamički niz je neophodno implementirati na što efikasniji način.
+
+Jedna česta implementacija dinamičkog niza podrazumeva čuvanje pokazivača $arr$ na jedan sekvencijalni blok memorije, kao i dva broja - trenutni broj elemenata u nizu, $size$, i maksimalni kapacitet prethodno pomenutog alociranog bloka memorije, $capacity$. Da bi se omogućilo dalje dodavanje elemenata i nakon dostizanja trenutnog kapaciteta bloka memorije, tj. nakon što se $size$ izjednači sa $capacity$, potrebno je nekako proširiti kapacitet bloka memorije na koji pokazuje $arr$. Ovo se može postići alociranjem novog bloka memorije sa kapacitetom većim od prethodnog, kopiranjem elemenata iz prethodnog bloka u novi i, na kraju, oslobađanjem memorije koju je zauzimao prethodni blok. Vremenska složenost ovog procesa, zbog alokacije novog bloka i kopiranja elemenata, zavisi kako od novog kapaciteta dinamičkog niza, tako i od memorijske veličine elemenata koji se skladište u nizu, ali pretpostavićemo da je ona proporcionalna $O(capacity')$, gde $capacity'$ predstavlja kapacitet novoalociranog bloka memorije.
+
+Da bi se obezbedio što manji broj realokacija niza, potrebno je izabrati odgovarajući faktor uvećanja njegovog kapaciteta prilikom alokacije novog memorijskog bloka. Naime, ispostavlja se da je potrebno koristiti geometrijsku strategiju uvećavanja kapaciteta da bi se omogućila amortizovana vremenska složenost $O(n)$ prilikom dodavanja $n$ elemenata na kraj dinamičkog niza. Najčešći izbori za faktor uvećanja prilikom realokacije su 1.5 ili 2, kao što je slučaj sa dinamičkim nizom u vidu klase \verb|std::vector<T, Allocator>| u većini implementacija standardne biblioteke programskog jezika \verb|C++|, poput implementacije \verb|libc++| u okviru projekta \verb|LLVM| \cite{libcxx-vector-growth}.
+
+Problem sa prethodnim pristupom je u proseku velika količina neiskorišćene, ali alocirane memorije. Malo detaljnijom analizom može se pokazati da je prosečna vrednost razlike kapaciteta i stvarnog broja elemenata, $capacity - size$ jednaka $O(size)$ ukoliko se primenjuje prethodno opisana strategija uvećavanja kapaciteta. Edvard Sitarski je 1996. godine opisao strukturu podataka koju je nazvao \verb|Hashed Array Tree|, ili u slobodnom prevodu stablo nizova, koja zadržava vremenske složenosti osnovnih operacija kao u standardnoj implementaciji dinamičkog niza, ali smanjuje prosečnu količinu neiskorišćene memorije na $O(\sqrt{size})$ \cite{hat-sitarski}.
+
+U nastavku ovog rada će biti opisana struktura stabla nizova i sprovedena analiza vremenske složenosti njenih osnovnih operacija, kao i memorijske složenosti. Dodatno, biće prikazana uporedna merenja performansi ove strukture implementirane u programskom jeziku \verb|C++| sa implementacijom dinamičkog vektora iz standardne biblioteke ovog jezika, \verb|std::vector<T, Allocator>|.
+
+\section{Opis strukture}
+
+\section{Analiza vremenske složenosti osnovnih operacija}
+
+\section{Analiza memorijske složenosti}
+
+\section{Eksperimentalno merenje performansi}
+
+\section{Zaključak}
+
+\addcontentsline{toc}{section}{Literatura}
+\appendix
+\bibliography{literatura} 
+\bibliographystyle{plain}
+
 \end{document}
+
