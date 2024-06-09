@@ -4,11 +4,13 @@
 \usepackage{xurl}
 \usepackage[T2A]{fontenc} % enable Cyrillic fonts
 \usepackage[utf8]{inputenc} % make weird characters work
+\usepackage{csquotes}
 \usepackage{graphicx}
 \usepackage{subfigure}
 \usepackage{float}
 \usepackage[english,serbian]{babel}
 \usepackage{listings}
+\usepackage{svg}
 
 \usepackage[unicode]{hyperref}
 \hypersetup{colorlinks,citecolor=green,filecolor=green,linkcolor=blue,urlcolor=blue}
@@ -42,6 +44,34 @@ U nastavku ovog rada će biti opisana struktura stabla nizova i sprovedena anali
 
 \section{Opis strukture}
 
+Stablo nizova je organizovano u dva nivoa. Prvi nivo, tj. koren stabla, je niz pokazivača neke dužine $m$ gde svaki od ovih pokazivača pokazuje na neki list stabla, ili ima $NULL$ vrednost, sa tim da $NULL$ vrednosti dolaze tek nakon pokazivača na listove. Listovi stabla, ili korpe, su takođe nizovi dužine $m$, pri čemu oni potencijalno sadrže deo skladištenih elemenata. Oni čine drugi nivo stabla nizova. Veličina nizova $m$ zavisi od trenutnog broja elemenata u nizu, ali se preporučuje da ona bude stepen dvojke, jer to omogućava efikasniji pristup elementima (detaljniji opis u narednom poglavlju). Primer jednog stabla nizova je prikazan na slici \ref{fig:hat-struktura-primer}.
+
+\begin{figure}[h!]
+    \centering
+    \includesvg{ilustracije/hat-struktura-primer.svg}
+    \caption{Izgled stabla nizova koje redom sadrži brojeve 5, 7, 2, 6, 2, 4, 8, 3, 2 i 4}
+    \label{fig:hat-struktura-primer}
+\end{figure}
+
+Za razliku od standardnih dinamičkih nizova, gde je sva alocirana memorija u jednom neprekidnom bloku, stablo nizova memoriju alocira u segmentima određene veličine. Iako ovaj pristup potencijalno kvari lokalnost referenci u \enquote{tačkama prekida} niza i uvodi dodatan nivo indirekcije pri pristupu elementima, on će omogućiti poboljšano iskorišćenje alocirane memorije.
+
+Za potrebe implementacije osnovnih operacija nad ovom strukturom (umetanje elemenata, brisanje elemenata, indeksni pristup elementima), pored samih pokazivača potrebno je održavati i vrednosti koje predstavljaju trenutni broj elemenata, trenutni kapacitet (jednak sumi veličina alociranih korpi) i trenutni stepen stabla nizova, tj. broj $p$ takav da je veličina korpi jednaka $m = 2^p$. Osnovna struktura je prikazana u listingu \ref{lst:osnovna-struktura}.
+
+U ostatku rada, stablo nizova će biti implementirano u programskom jeziku \verb|C++| u vidu klase \verb|hat_vector<T, Allocator>|. Svi kodovi će biti predstavljeni u pojednostavljenoj formi radi jednostavnije analize, a kompletna implementacija se može naći na \url{https://github.com/Aca-S/hashed-array-tree/}.
+
+\begin{lstlisting}[language=C++, caption={Osnovna struktura stabla nizova}, captionpos=b, label={lst:osnovna-struktura}]
+template <typename T, typename Allocator>
+class hat_vector
+{
+    ...
+    T** m_data; // Pokazivac na pocetak korenskog niza
+    size_t m_power;     // Trenutni stepen stabla nizova
+    size_t m_size;      // Trenutni broj elemenata
+    size_t m_capacity;  // Trenutni kapacitet
+    ...
+};
+\end{lstlisting}
+
 \section{Analiza vremenske složenosti osnovnih operacija}
 
 \section{Analiza memorijske složenosti}
@@ -56,4 +86,3 @@ U nastavku ovog rada će biti opisana struktura stabla nizova i sprovedena anali
 \bibliographystyle{plain}
 
 \end{document}
-
