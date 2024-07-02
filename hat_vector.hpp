@@ -237,14 +237,14 @@ void hat_vector<T, Allocator>::pop_back()
 template <typename T, typename Allocator>
 typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::insert(hat_vector<T, Allocator>::const_iterator pos, std::size_t count, const T& value)
 {
+    const auto pos_idx = pos - cbegin();
+    
     if (count == 0) {
-        return begin();
+        return begin() + pos_idx;
     }
     
     const std::size_t new_size = m_size + count;
     reserve(new_size);
-    
-    const auto pos_idx = pos - cbegin();
     
     const auto r_bucket = (new_size - 1) >> m_power;
     const auto l_bucket = (pos_idx + count) >> m_power;
