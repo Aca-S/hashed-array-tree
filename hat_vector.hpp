@@ -55,6 +55,7 @@ public:
     void pop_back();
     
     iterator insert(const_iterator pos, std::size_t count, const T& value);
+    iterator insert_opt(const_iterator pos, std::size_t count, const T& value);
     
     iterator erase(const_iterator first, const_iterator last);
     iterator erase(const_iterator pos);
@@ -236,32 +237,35 @@ void hat_vector<T, Allocator>::pop_back()
 template <typename T, typename Allocator>
 typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::insert(hat_vector<T, Allocator>::const_iterator pos, std::size_t count, const T& value)
 {
-    const std::size_t new_size = m_size + count;
-    if (new_size == 0) {
+    if (count == 0) {
         return begin();
     }
     
-    std::size_t required_power = smallest_power_of_two_to_hold(new_size);
+    const std::size_t new_size = m_size + count;
+    reserve(new_size);
     
-    if (required_power > m_power) {
-        resize_to_higher(required_power);
+    const auto pos_idx = pos - cbegin();
+    
+    const auto r_bucket = (new_size - 1) >> m_power;
+    const auto l_bucket = (pos_idx + count) >> m_power;
+    
+    const auto bucket_size = 1 << m_power;
+    const auto bp = count & ((1 << m_power) - 1);
+    const auto spacing = count >> m_power;
+    
+    for (auto bucket = r_bucket; bucket > l_bucket; --bucket) {
+        std::uninitialized_copy_n(m_data[bucket - spacing], bucket_size - bp, m_data[bucket] + bp);
+        std::uninitialized_copy_n(m_data[bucket - spacing - 1] + bucket_size - bp, bp, m_data[bucket]);
     }
+    std::uninitialized_copy_n(m_data[l_bucket - spacing], bucket_size - bp, m_data[l_bucket] + bp);
     
-    while (new_size > m_capacity) {
-        allocate_bucket();
-    }
-    
-    std::size_t offset = pos - cbegin();
-    
-    // Right shift simulation
-    std::uninitialized_copy(crbegin(), crend() - offset, rbegin() - count);
-    for (auto it = begin() + offset; it != begin() + offset + count; ++it) {
-        *it = value;
+    for (std::size_t i = pos_idx; i < pos_idx + count; ++i) {
+        (*this)[i] = value;
     }
     
     m_size = new_size;
     
-    return begin() + offset;
+    return begin() + pos_idx;
 }
 
 template <typename T, typename Allocator>
@@ -316,11 +320,11 @@ void hat_vector<T, Allocator>::reserve(std::size_t new_capacity)
         return;
     }
     
-    std::size_t required_power = smallest_power_of_two_to_hold(new_capacity);
+    std::size_t required_power = smallest_power_of_two_to_hold(new_capacity) >> 1;
     if (required_power > m_power) {
         resize_to_higher(required_power);
     }
-    
+        
     while (m_capacity < new_capacity) {
         allocate_bucket();
     }
