@@ -72,7 +72,34 @@ class hat_vector
 };
 \end{lstlisting}
 
-\section{Analiza vremenske složenosti osnovnih operacija}
+\section{Analiza osnovnih operacija}
+
+Kao što je slučaj i sa standardnim implementacijama strukture dinamičkog niza, stablo nizova pruža mogućnosti efikasnog umetanja elemenata na kraj i indeksnog pristupa elementima. Dodatno, pružene su i operacije umetanja elemenata na proizvoljnu poziciju, kao i brisanje elemenata sa proizvoljne pozicije.
+
+\subsection{Pristup elementu po indeksu}
+
+Da bi se u stablu nizova pristupilo nekom elementu po indeksu, prvo je potrebno naći list, tj. korpu kojoj pripada dati indeks, pa onda i tačnu poziciju koja odgovara indeksu unutar te korpe. Pošto su koren i sve korpe stabla iste veličine, redni broj odgovarajuće korpe se može dobiti kao količnik indeksa i veličine korpe, a pozicija unutar korpe kao ostatak pri deljenju indeksa i veličine korpe. S obzirom na to da je potrebno izvršiti samo ove dve operacije i onda pristupiti odgovarajućoj memorijskoj lokaciji, vremenska složenost pristupa elementu po indeksu je $O(1)$, tj. ne zavisi od broja elemenata u strukturi.
+
+Iako je vremenska složenost indeksnog pristupa $O(1)$, on je i dalje poprilično skup usled upotrebe operacija deljenja i modula po veličini korpe. Iz ovog razloga, za veličinu korpi se obično uzimaju stepeni dvojke, jer to omogućava efikasnu implementaciju deljeja i modula po tom broju. Naime, neka je veličina korpe jednaka $m = 2^p$. Tada važi:
+\begin{enumerate}
+    \item \verb|pos / m = pos >> p|
+    \item \verb|pos % m = pos & ((1 << p) - 1)|
+\end{enumerate}
+Prema tome, skupe operacije deljenja i modula se mogu zameniti jeftinim bitovskim operacijama. Implementacija ove operacije je prikazana u listingu \ref{lst:pristup-elementu}.
+
+\begin{lstlisting}[language=C++, caption={Operacija pristupa elementu po indeksu \textit{pos}}, captionpos=b, label={lst:pristup-elementu}]
+template <typename T, typename Allocator>
+T& hat_vector<T, Allocator>::operator[](size_t pos)
+{
+    return m_data[pos >> m_power][pos & ((1 << m_power) - 1)];
+}
+\end{lstlisting}
+
+\subsection{Umetanje elementa na kraj}
+
+\subsection{Umetanje elementa na proizvoljnu poziciju}
+
+\subsection{Brisanje elementa sa proizvoljne pozicije}
 
 \section{Analiza memorijske složenosti}
 
@@ -82,7 +109,7 @@ class hat_vector
 
 \addcontentsline{toc}{section}{Literatura}
 \appendix
-\bibliography{literatura} 
+\bibliography{literatura}
 \bibliographystyle{plain}
 
 \end{document}
