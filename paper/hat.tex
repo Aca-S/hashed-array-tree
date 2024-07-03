@@ -10,10 +10,15 @@
 \usepackage{float}
 \usepackage[english,serbian]{babel}
 \usepackage{listings}
-\usepackage{svg}
+\usepackage{amsthm}
+\usepackage{amsmath}
 
 \usepackage[unicode]{hyperref}
 \hypersetup{colorlinks,citecolor=green,filecolor=green,linkcolor=blue,urlcolor=blue}
+
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lema}
 
 \title{Hashed Array Tree, ili stablo nizova\\ \small{Seminarski rad u okviru kursa\\Konstrukcija i analiza algoritama 2\\ Matematički fakultet}}
 \author{Aleksandar Stefanović, 1021/2023}
@@ -48,7 +53,7 @@ Stablo nizova je organizovano u dva nivoa. Prvi nivo, tj. koren stabla, je niz p
 
 \begin{figure}[h!]
     \centering
-    \includesvg{ilustracije/hat-struktura-primer.svg}
+    \includegraphics[width=0.55\textwidth]{ilustracije/hat-struktura-primer.png}
     \caption{Izgled stabla nizova koje redom sadrži brojeve 5, 7, 2, 6, 2, 4, 8, 3, 2 i 4}
     \label{fig:hat-struktura-primer}
 \end{figure}
@@ -95,7 +100,56 @@ T& hat_vector<T, Allocator>::operator[](size_t pos)
 }
 \end{lstlisting}
 
-\subsection{Umetanje elementa na kraj}
+\subsection{Dodavanje elementa na kraj}
+
+U zavisnosti od trenutnog broja elemenata, kapaciteta i stepena stabla nizova, dodavanje elementa na kraj, pored upisa vrednosti na odgovarajuću memorijsku lokaciju, može zahtevati i povećanje stepena stabla i kopiranje svih prethodnih elemenata na nove memorijske lokacije i/ili alokaciju memorijskog prostora za novu korpu. Razmotrimo najgori slučaj, u kojem je potrebno izvršiti uvećanje stepena stabla, kroz primer dodavanja broja 4 na kraj kada imamo stablo nizova koje je prikazano na slici \ref{fig:dodavanje-na-kraj-primer-pocetak}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.3\textwidth]{ilustracije/dodavanje-na-kraj-primer-1.png}
+    \caption{Puno stablo nizova stepena 1, tj. maksimalnog mogućeg kapaciteta 4}
+    \label{fig:dodavanje-na-kraj-primer-pocetak}
+\end{figure}
+
+Ovo stablo je dostiglo maksimalan broj elemenata za svoj stepen, u ovom slučaju 4. Samo alociranje nove korpe nije moguće, pa je iz tog razloga prvo potrebno uvećati stepen stabla i time udvostručiti veličinu korena i korpi. Ovo se sprovodi alokacijom novog memorijskog prostora i kopiranjem svih elemenata iz starog stabla u novo stablo, stepena većeg za jedan. Novodobijeno stablo nizova za ovaj primer prikazano je na slici \ref{fig:dodavanje-na-kraj-primer-postupak} (a).
+
+Po uvećanju stepena stabla nizova sa $p$ na $p + 1$, broj alociranih korpi u novom stablu biće jednak količniku broja elemenata u punom stablu stepena $p$ i veličine korpe u stablu stepena $p + 1$, tj. $\frac{2^{2p}}{2^{p + 1}} = 2^{p - 1}$. S obzirom na to da je ovaj količnik ceo broj, sve korpe dobijene uvećanjem stepena stabla biće popunjene do kraja, te je potrebno alocirati još jednu korpu za potrebe skladištenja elementa koji se dodaje na kraj, u ovom slučaju broja 4 - prikazano na slikama \ref{fig:dodavanje-na-kraj-primer-postupak} (b) i (c).
+
+\begin{figure}[h!]
+    \centering
+    \subfigure[]{
+        \includegraphics[width=0.3\textwidth]{ilustracije/dodavanje-na-kraj-primer-2.png}
+    }
+    \subfigure[]{
+        \includegraphics[width=0.3\textwidth]{ilustracije/dodavanje-na-kraj-primer-3.png}
+    }
+    \subfigure[]{
+        \includegraphics[width=0.3\textwidth]{ilustracije/dodavanje-na-kraj-primer-4.png}
+    }
+    \caption{Postupak dodavanja elementa na kraj}
+    \label{fig:dodavanje-na-kraj-primer-postupak}
+\end{figure}
+
+Iako je, usled kopiranja svih elemenata, vremenska složenost prethodno opisanog najgoreg slučaja jednaka $O(n)$, gde je $n$ broj elemenata u stablu nizova, u najvećem broju slučajeva uvećanje stepena stabla neće biti potrebno. Naime, do ovog slučaja dolazi samo kada je broj elemenata, pre dodavanja još jednog, jednak $2^{2p}$, gde je $p$ trenutni stepen stabla nizova.
+
+\begin{lemma}
+Amortizovana složenost operacije dodavanja elementa na kraj stabla nizova je $O(1)$.
+\end{lemma}
+
+\begin{proof}
+Pretpostavimo da, počev od praznog stabla nizova, dodajemo $n + 1$ elemenata na njegov kraj. Neka je, bez gubitka opštosti, $n = 2^{2p}$, gde je $p$ najmanji stepen stabla za koji ono može da sadrži $n$ elemenata. Tada za ukupan broj kopiranja elemenata važi
+\begin{equation}
+\begin{split}
+    br\_kopiranja &= 2^{2p} + 2^{2(p - 1)} + 2^{2(p - 2)} + ... + 2^{2(p - p)} \\
+    &= n + \frac{n}{4} + \frac{n}{16} + ... + \frac{n}{n} \\
+    &< n + \frac{n}{4} + \frac{n}{16} + ... \\
+    &= n(1 + \frac{1}{4} + \frac{1}{16} + ...) \\
+    &= n \cdot \frac{4}{3}.
+\end{split}
+\end{equation}
+
+Ukoliko za ukupnu cenu dodavanja $n + 1$ elemenata uzmemo zbir broja kopiranja i broja direktnih upisa vrednosti u memoriju (zanemarivši cenu alokacije pojedinačnih korpi, koja zavisi od konkretne strategije za alokaciju i stanja u memoriji), ukupna cena ovog procesa jednaka je $n + 1 + n \cdot \frac{4}{3}$. Prema tome, amortizovana cena dodavanja elementa na kraj jednaka je $\frac{n + 1 + n \cdot \frac{4}{3}}{n + 1} = O(1)$.
+\end{proof}
 
 \subsection{Umetanje elementa na proizvoljnu poziciju}
 
@@ -109,7 +163,7 @@ T& hat_vector<T, Allocator>::operator[](size_t pos)
 
 \addcontentsline{toc}{section}{Literatura}
 \appendix
-\bibliography{literatura}
+\bibliography{literatura} 
 \bibliographystyle{plain}
 
 \end{document}
