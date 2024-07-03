@@ -8,11 +8,15 @@ int main(int argc, char *argv[])
 {
     hat_vector<int> v;
     
-    for (int i = 1; i <= 10; i++) {
+    for (int i = 1; i <= 17; i++) {
         v.push_back(i);
     }
-    
-    v.erase(v.begin() + 2, v.begin() + 5);
+
+    v.pop_back();
+    v.shrink_to_fit();
+
+    v.erase(v.begin(), v.begin() + 4);
+    v.shrink_to_fit();
     
     for (auto el : v) {
         std::cout << el << " ";

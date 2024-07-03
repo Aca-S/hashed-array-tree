@@ -67,6 +67,7 @@ public:
     bool empty() const;
     
     void reserve(std::size_t new_capacity);
+    void shrink_to_fit();
     
     friend void swap<>(hat_vector<T, Allocator> &first, hat_vector<T, Allocator> &second);
     
@@ -84,6 +85,7 @@ public:
     
 private:
     void resize_to_higher(std::size_t new_power);
+    void resize_to_lower(std::size_t new_power);
     void deallocate();
     void allocate_bucket();
 
@@ -191,6 +193,33 @@ void hat_vector<T, Allocator>::resize_to_higher(std::size_t new_power)
 }
 
 template <typename T, typename Allocator>
+void hat_vector<T, Allocator>::resize_to_lower(std::size_t new_power)
+{
+    assert(new_power < m_power && "hat_vector<T, Allocator>::allocate_lower requires a power lower than hat_vector<T, Allocator>::m_power");
+    assert(m_size <= (1 << m_power << m_power) && "hat_vector<T, Allocator>::allocate_lower requires that new_power is large enough for the vector to contain the current elements");
+
+    const std::size_t old_bucket_size = 1 << m_power;
+    const std::size_t new_bucket_size = 1 << new_power;
+
+    const std::size_t buckets_to_alloc = m_size == 0 ? 0 : 1 + (m_size - 1 >> new_power);
+
+    T** new_data = new T*[new_bucket_size];
+    for (std::size_t i = 0; i < buckets_to_alloc; ++i) {
+        new_data[i] = m_allocator.allocate(new_bucket_size);
+    }
+
+    for (std::size_t copied = 0; copied < m_size; copied += new_bucket_size) {
+        std::uninitialized_copy_n(m_data[copied >> m_power] + (copied & (old_bucket_size - 1)), new_bucket_size, new_data[copied >> new_power]);
+    }
+
+    deallocate();
+
+    m_data = new_data;
+    m_power = new_power;
+    m_capacity = buckets_to_alloc << new_power;
+}
+
+template <typename T, typename Allocator>
 void hat_vector<T, Allocator>::deallocate()
 {
     const std::size_t num_of_buckets = m_capacity >> m_power;
@@ -274,7 +303,7 @@ typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::erase(cons
     const auto count = last - first;
     const auto pos_idx = first - cbegin();
 
-    if (count < 0) {
+    if (count <= 0) {
         return begin() + (last - cbegin());
     }
 
@@ -336,6 +365,25 @@ void hat_vector<T, Allocator>::reserve(std::size_t new_capacity)
         
     while (m_capacity < new_capacity) {
         allocate_bucket();
+    }
+}
+
+template <typename T, typename Allocator>
+void hat_vector<T, Allocator>::shrink_to_fit()
+{
+    std::size_t log_2_size = smallest_power_of_two_to_hold(m_size);
+    std::size_t required_power = (log_2_size >> 1) + (log_2_size & 1);
+
+    if (required_power < m_power) {
+        resize_to_lower(required_power);
+    }
+
+    const std::size_t bucket_size = 1 << m_power;
+
+    while (m_capacity >= m_size + bucket_size) {
+        const std::size_t bucket_idx = (m_capacity >> m_power) - 1;
+        m_allocator.deallocate(m_data[bucket_idx], bucket_size);
+        m_capacity -= bucket_size;
     }
 }
 
