@@ -8,12 +8,11 @@ int main(int argc, char *argv[])
 {
     hat_vector<int> v;
     
-    v.reserve(10000);
-    for (int i = 1; i <= 10000; i++) {
-        v.insert(v.begin(), 1, i);
+    for (int i = 1; i <= 10; i++) {
+        v.push_back(i);
     }
     
-    std::sort(v.begin(), v.end());
+    v.erase(v.begin() + 2, v.begin() + 5);
     
     for (auto el : v) {
         std::cout << el << " ";

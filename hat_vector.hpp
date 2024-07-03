@@ -243,7 +243,7 @@ typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::insert(hat
         return begin() + pos_idx;
     }
     
-    const std::size_t new_size = m_size + count;
+    const auto new_size = m_size + count;
     reserve(new_size);
     
     const auto r_bucket = (new_size - 1) >> m_power;
@@ -259,7 +259,7 @@ typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::insert(hat
     }
     std::uninitialized_copy_n(m_data[l_bucket - spacing], bucket_size - bp, m_data[l_bucket] + bp);
     
-    for (std::size_t i = pos_idx; i < pos_idx + count; ++i) {
+    for (auto i = pos_idx; i < pos_idx + count; ++i) {
         (*this)[i] = value;
     }
     
@@ -271,16 +271,24 @@ typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::insert(hat
 template <typename T, typename Allocator>
 typename hat_vector<T, Allocator>::iterator hat_vector<T, Allocator>::erase(const_iterator first, const_iterator last)
 {
-    std::size_t erased = std::distance(first, last);
+    const auto count = last - first;
+    const auto pos_idx = first - cbegin();
 
-    iterator nc_first = begin() + (first - cbegin());
-    iterator nc_last = begin() + (last - cbegin());
+    if (count < 0) {
+        return begin() + (last - cbegin());
+    }
 
-    std::uninitialized_copy(last, cend(), nc_first);
-        
-    m_size -= erased;
+    for (auto i = pos_idx; i < pos_idx + count; ++i) {
+        (*this)[i].~T();
+    }
+
+    for (auto i = pos_idx; i < m_size - count; ++i) {
+        (*this)[i] = (*this)[i + count];
+    }
+
+    m_size -= count;
     
-    return nc_first;
+    return begin() + pos_idx;
 }
 
 template <typename T, typename Allocator>
@@ -320,7 +328,8 @@ void hat_vector<T, Allocator>::reserve(std::size_t new_capacity)
         return;
     }
     
-    std::size_t required_power = smallest_power_of_two_to_hold(new_capacity) >> 1;
+    std::size_t log_2_capacity = smallest_power_of_two_to_hold(new_capacity);
+    std::size_t required_power = (log_2_capacity >> 1) + (log_2_capacity & 1);
     if (required_power > m_power) {
         resize_to_higher(required_power);
     }
