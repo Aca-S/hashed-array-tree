@@ -153,7 +153,15 @@ Ukoliko za ukupnu cenu dodavanja $n + 1$ elemenata uzmemo zbir broja kopiranja i
 
 \subsection{Umetanje elementa na proizvoljnu poziciju}
 
+Za razliku od operacije dodavanja elementa na kraj, umetanje elementa na proizvoljnu poziciju nema amortizovanu vremensku složenost $O(1)$. Pre svega, ukoliko se dodavanjem novog elementa prekoračuje trenutni kapacitet stabla nizova, potrebno je izvršiti alokaciju dodatnog prostora na isti način kao u slučaju dodavanja elementa na kraj. Nakon toga, elementi počev od poslednjeg, pa sve do onog na poziciji umetanja novog elementa, se kopiraju za jednu poziciju \textit{udesno}, što može zahtevati i njihovo kopiranje u korpu različitu od one u kojoj su se nalazili pre umetanja novog elementa. Ovaj postupak u najgorem slučaju (pri umetanju na sam početak stabla nizova), zahteva $n$ kopiranja, gde je $n$ broj sadržanih elemenata. Konačno, na lokaciju indeksa umetanja se upisuje nova vrednost i veličina stabla nizova, tj. vrednost \verb|m_size| se uvećava.
+
 \subsection{Brisanje elementa sa proizvoljne pozicije}
+
+Slično kao i kod umetanja elementa na proizvoljnu poziciju, brisanje elementa sa proizvoljne pozicije takođe zahteva kopiranje potencijalno velikog broja elemenata. Razlika je u tome što se sada, umesto kopiranja elemenata na desno, vrši kopiranje elemenata za jednu poziciju na levo, i to počev od jedne pozicije iza pozicije brisanja, pa sve do poslednje pozicije u stablu nizova. Prema tome, do najvećeg broja kopiranja, tj. njih $n$, dolazi u slučaju brisanja prvog elementa u stablu nizova, dok pri brisanju sa kraja nema kopiranja, u kom slučaju se ono izvršava u $O(1)$.
+
+Jedna važna odlika ove operacije je strategija oslobađanja alocirane memorije nakon brisanja elemenata. Nakon brisanja većeg broja elemenata, alocirana memorija strukture, tj. njen kapacitet \verb|m_capacity|, potencijalno postaje dosta veća od stvarnog broja elemenata koji se skladišti u njoj, tj. vrednosti \verb|m_size|. Da bi se prevazišao ovaj problem neiskorišćenog alociranog prostora, moguće je vršiti dealokaciju praznih korpi (ukoliko one postoje), kao i kopiranje svih elemenata stabla nizova u stablo nizova manjeg stepena, ukoliko oni mogu da stanu u takvo stablo (stablo stepena $p$ može sadržati najviše $2^{2p}$ elemenata).
+
+Iako prethodna strategija ne narušava asimptotsku vremensku složenost operacije brisanja sa proizvoljne pozicije, ona može za nezanemarljiv konstantan faktor usporiti njeno izvršavanje u slučaju da stablo nizova sadrži $2^{2p} + 1$ element, gde je $p$ neki nenegativan ceo broj, kao i da uspori kasnije operacije dodavanja elemenata usled potrebe da se ponovo izvrši alokacija dodatne memorije. Iz tog razloga, a isto kao i u slučaju većine implementacija kolekcije \verb|std::vector<T, Allocator>|, u priloženoj implementaciji metod \verb|erase| ne vrši nikakvo oslobađanje viška kapaciteta, već je pružen metod \verb|shrink_to_fit| koji po pozivu smanjuje stepen stabla na najmanji mogući i oslobađa sve prazne, a alocirane, korpe.
 
 \section{Analiza memorijske složenosti}
 
@@ -163,7 +171,7 @@ Ukoliko za ukupnu cenu dodavanja $n + 1$ elemenata uzmemo zbir broja kopiranja i
 
 \addcontentsline{toc}{section}{Literatura}
 \appendix
-\bibliography{literatura} 
+\bibliography{literatura}
 \bibliographystyle{plain}
 
 \end{document}
