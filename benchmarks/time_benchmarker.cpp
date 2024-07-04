@@ -12,7 +12,7 @@ void push_back_and_sort(std::size_t n)
     std::uniform_int_distribution<> dist(1, 10);
     std::mt19937 gen(1234);
 
-    std::vector<int> v;
+    hat_vector<int> v;
 
     for (std::size_t i = 0; i < n; ++i) {
         v.push_back(dist(gen));
@@ -41,7 +41,7 @@ void benchmarker(const std::vector<std::size_t> &sizes, std::size_t repeats, con
 
 int main(int argc, char *argv[])
 {
-    benchmarker({1'000, 10'000, 100'000, 1'000'000, 10'000'000, 100'000'000}, 5, &push_back_and_sort);
+    benchmarker({1'000, 10'000, 100'000, 1'000'000, 10'000'000, 100'000'000}, 10, &push_back_and_sort);
 
     return 0;
 }

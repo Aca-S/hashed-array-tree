@@ -182,15 +182,38 @@ Uvećanje kapaciteta stabla nizova se, u zavisnosti od broja elemenata pre dodav
 \end{enumerate}
 \end{proof}
 
-Iako je iskorišćenost alocirane memorije asimptotski bolja u slučaju stabla nizova nego u slučaju standardnog dinamičkog niza, treba imati u vidu da je u stablu nizova u svakom trenutku potrebno dodatni niz, tj. koren stabla, veličine $O(\sqrt{size})$.
+Ovaj zaključak je prikazan i na slici \ref{fig:cap-size-razlika} za popunjenost do 1024 elementa. Treba imati u vidu da je, iako je iskorišćenost alocirane memorije asimptotski bolja u slučaju stabla nizova nego u slučaju standardnog dinamičkog niza, u stablu nizova u svakom trenutku potrebno čuvati dodatni niz, tj. koren stabla, veličine $O(\sqrt{size})$.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.70\textwidth]{ilustracije/cap-size-razlika.png}
+    \caption{Neiskorišćeni alocirani ($capacity - size$) u odnosu na broj elemenata ($size$)}
+    \label{fig:cap-size-razlika}
+\end{figure}
 
 \section{Eksperimentalno merenje performansi}
+
+U ovom poglavlju će biti izmerene performanse implementirane kolekcije zasnovane na stablu nizova, \verb|hat_vector|, u odnosu na kolekciju vektora iz standardne biblioteke programskog jezika \verb|C++|, \verb|std::vector|. Eksperiment podrazumeva dodavanje određenog broja uniformno raspodeljenih \verb|int| brojeva na kraj kolekcije metodom \verb|push_back|, nakon čega se ta kolekcija sortira rastuće pozivom funkcije iz standardne biblioteke \verb|std::sort|. Sličan eksperiment je izveo i Edvard Sitarski u radu u kojem je predstavio ovu strukturu podataka \cite{hat-sitarski}.
+
+Rezultati su prikazani na slici \ref{fig:benchmarks-pb-sort}. Kao što je i očekivano, izvršavanje traje malo duže u slučaju \verb|hat_vector| kolekcije usled dva nivoa indirekcije prilikom pristupa traženom elementu. Razlika je oko 11.6 sekundi za 100 000 000 elemenata, ali je iskorišćenost memorije oko 723MB naspram oko 1024MB. Eksperimenti su izvršeni na \verb|AMD Ryzen 7 7730U| procesoru.
+
+\begin{figure}[h!]
+    \centering
+    \subfigure[]{
+        \includegraphics[width=0.47\textwidth]{ilustracije/benchmarks-push-back-sort-vreme.png}
+    }
+    \subfigure[]{
+        \includegraphics[width=0.47\textwidth]{ilustracije/benchmarks-push-back-sort-memorija.png}
+    }
+    \caption{Performanse (a) i memorijsko zauzeće (b) pri dodavanju i sortiranju $n$ elemenata u odnosu na kolekciju vektora iz standardne biblioteke}
+    \label{fig:benchmarks-pb-sort}
+\end{figure}
 
 \section{Zaključak}
 
 \addcontentsline{toc}{section}{Literatura}
 \appendix
-\bibliography{literatura}
+\bibliography{literatura} 
 \bibliographystyle{plain}
 
 \end{document}

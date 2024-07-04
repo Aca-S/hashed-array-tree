@@ -1,15 +1,15 @@
 hat_vector - push_back_and_sort:
-n = 1000, time = 0.00016036s
-n = 10000, time = 0.00208267s
-n = 100000, time = 0.0258267s
-n = 1000000, time = 0.320089s
-n = 10000000, time = 3.80586s
-n = 100000000, time = 43.7231s
+n = 1000, time = 0.00016036s, mem = 78,656 bytes
+n = 10000, time = 0.00208267s, mem = 137,024 bytes
+n = 100000, time = 0.0258267s, mem = 831,808 bytes
+n = 1000000, time = 0.320089s, mem = 5,488,960 bytes
+n = 10000000, time = 3.80586s, mem = 62,517,568 bytes
+n = 100000000, time = 43.7231s, mem = 758,280,512 bytes
 
 std::vector - push_back_and_sort:
-n = 1000, time = 0.000133749s
-n = 10000, time = 0.00167378s
-n = 100000, time = 0.0204271s
-n = 1000000, time = 0.236498s
-n = 10000000, time = 2.73454s
-n = 100000000, time = 32.0964s
+n = 1000, time = 0.000133749s, mem = 80,892 bytes
+n = 10000, time = 0.00167378s, mem = 203,772 bytes
+n = 100000, time = 0.0204271s, mem = 1,121,276 bytes
+n = 1000000, time = 0.236498s, mem = 8,461,308 bytes
+n = 10000000, time = 2.73454s, mem = 134,290,428 bytes
+n = 100000000, time = 32.0964s, mem = 1,073,814,524 bytes
