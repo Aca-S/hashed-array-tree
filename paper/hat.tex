@@ -43,7 +43,7 @@ Jedna česta implementacija dinamičkog niza podrazumeva čuvanje pokazivača $a
 
 Da bi se obezbedio što manji broj realokacija niza, potrebno je izabrati odgovarajući faktor uvećanja njegovog kapaciteta prilikom alokacije novog memorijskog bloka. Naime, ispostavlja se da je potrebno koristiti geometrijsku strategiju uvećavanja kapaciteta da bi se omogućila amortizovana vremenska složenost $O(n)$ prilikom dodavanja $n$ elemenata na kraj dinamičkog niza. Najčešći izbori za faktor uvećanja prilikom realokacije su 1.5 ili 2, kao što je slučaj sa dinamičkim nizom u vidu klase \verb|std::vector<T, Allocator>| u većini implementacija standardne biblioteke programskog jezika \verb|C++|, poput implementacije \verb|libc++| u okviru projekta \verb|LLVM| \cite{libcxx-vector-growth}.
 
-Problem sa prethodnim pristupom je u proseku velika količina neiskorišćene, ali alocirane memorije. Malo detaljnijom analizom može se pokazati da je prosečna vrednost razlike kapaciteta i stvarnog broja elemenata, $capacity - size$ jednaka $O(size)$ ukoliko se primenjuje prethodno opisana strategija uvećavanja kapaciteta. Edvard Sitarski je 1996. godine opisao strukturu podataka koju je nazvao \verb|Hashed Array Tree|, ili u slobodnom prevodu stablo nizova, koja zadržava vremenske složenosti osnovnih operacija kao u standardnoj implementaciji dinamičkog niza, ali smanjuje prosečnu količinu neiskorišćene memorije na $O(\sqrt{size})$ \cite{hat-sitarski}.
+Problem sa prethodnim pristupom je u proseku velika količina neiskorišćene, ali alocirane memorije. Malo detaljnijom analizom može se pokazati da je u najgorem slučaju vrednost razlike kapaciteta i stvarnog broja elemenata, $capacity - size$ jednaka $O(size)$ ukoliko se primenjuje prethodno opisana strategija uvećavanja kapaciteta. Edvard Sitarski je 1996. godine opisao strukturu podataka koju je nazvao \verb|Hashed Array Tree|, ili u slobodnom prevodu stablo nizova, koja zadržava vremenske složenosti osnovnih operacija kao u standardnoj implementaciji dinamičkog niza, ali smanjuje količinu neiskorišćene memorije na $O(\sqrt{size})$ \cite{hat-sitarski}.
 
 U nastavku ovog rada će biti opisana struktura stabla nizova i sprovedena analiza vremenske složenosti njenih osnovnih operacija, kao i memorijske složenosti. Dodatno, biće prikazana uporedna merenja performansi ove strukture implementirane u programskom jeziku \verb|C++| sa implementacijom dinamičkog vektora iz standardne biblioteke ovog jezika, \verb|std::vector<T, Allocator>|.
 
@@ -101,6 +101,7 @@ T& hat_vector<T, Allocator>::operator[](size_t pos)
 \end{lstlisting}
 
 \subsection{Dodavanje elementa na kraj}
+\label{subsec:dodavanje-elementa-na-kraj}
 
 U zavisnosti od trenutnog broja elemenata, kapaciteta i stepena stabla nizova, dodavanje elementa na kraj, pored upisa vrednosti na odgovarajuću memorijsku lokaciju, može zahtevati i povećanje stepena stabla i kopiranje svih prethodnih elemenata na nove memorijske lokacije i/ili alokaciju memorijskog prostora za novu korpu. Razmotrimo najgori slučaj, u kojem je potrebno izvršiti uvećanje stepena stabla, kroz primer dodavanja broja 4 na kraj kada imamo stablo nizova koje je prikazano na slici \ref{fig:dodavanje-na-kraj-primer-pocetak}.
 
@@ -164,6 +165,24 @@ Jedna važna odlika ove operacije je strategija oslobađanja alocirane memorije 
 Iako prethodna strategija ne narušava asimptotsku vremensku složenost operacije brisanja sa proizvoljne pozicije, ona može za nezanemarljiv konstantan faktor usporiti njeno izvršavanje u slučaju da stablo nizova sadrži $2^{2p} + 1$ element, gde je $p$ neki nenegativan ceo broj, kao i da uspori kasnije operacije dodavanja elemenata usled potrebe da se ponovo izvrši alokacija dodatne memorije. Iz tog razloga, a isto kao i u slučaju većine implementacija kolekcije \verb|std::vector<T, Allocator>|, u priloženoj implementaciji metod \verb|erase| ne vrši nikakvo oslobađanje viška kapaciteta, već je pružen metod \verb|shrink_to_fit| koji po pozivu smanjuje stepen stabla na najmanji mogući i oslobađa sve prazne, a alocirane, korpe.
 
 \section{Analiza memorijske složenosti}
+
+Glavna prednost stabla nizova u odnosu na standardnu implementaciju dinamičkog niza je veći stepen iskorišćenosti alociranog memorijskog prostora. Neka $size$ označava broj elemenata u kolekciji, a $capacity$ alocirani kapacitet kolekcije. Za razliku od standardnog dinamičkog niza gde važi $capacity - size = O(size)$ (najgori slučaj odmah po uvećanju kapaciteta za neki faktor), za stablo nizova važi $capacity - size = O(\sqrt{size})$.
+
+\begin{lemma}
+Ukoliko se ne izvršavaju operacije brisanja elemenata, za stablo nizova važi $capacity - size = O(\sqrt{size})$, gde $capacity$ označava kapacitet \verb|m_capacity|, a $size$ broj elemenata \verb|m_size|.
+\end{lemma}
+
+\begin{proof}
+Uvećanje kapaciteta stabla nizova se, u zavisnosti od broja elemenata pre dodavanja novog, može izvršiti na dva načina. U prvom slučaju, broj elemenata pre umetanja je manji od $2^{2p}$, gde je $p$ trenutni stepen stabla, pa je moguće samo alocirati jednu novu korpu i time proširiti kapacitet. U drugom slučaju, tj. onda kada je broj elemenata pre umetanja jednak $2^{2p}$, potrebno je pre alociranja korpe uvećati stepen stabla. Razmotrimo oba slučaja detaljnije:
+\begin{enumerate}
+    \item $size < 2^{2p}$\\
+    U ovom slučaju se alocira novi list stabla, tj. korpa, kapaciteta $2^p$. U tu korpu će biti ubačen element koji se dodaje, a ostatak će ostati prazan, pa sledi da je $capacity - size = 2^p - 1$. Ako pretpostavimo da važi $size > 2^{2(p - 1)} = \frac{2^{2p}}{4}$ (broj elemenata je jednak barem maksimalnom broju elemenata koje stablo prethodnog stepena može da sadrži), onda važi $capacity - size = 2^p - 1 = O(2^{p}) = O(\sqrt{\frac{2^{2p}}{4}}) = O(\sqrt{size})$.
+    \item $size = 2^{2p}$\\
+    Kao što je prikazano u \ref{subsec:dodavanje-elementa-na-kraj}, u ovom slučaju je potrebno konstruisati novo stablo stepena $p + 1$ i alocirati dodatno korpu veličine $2^{p + 1}$ u takvom stablu za novi element. Prema tome, nakon umetanja elementa važiće $capacity - size = 2^{p + 1} - 1 = O(2^{p}) = O(\sqrt{size})$.
+\end{enumerate}
+\end{proof}
+
+Iako je iskorišćenost alocirane memorije asimptotski bolja u slučaju stabla nizova nego u slučaju standardnog dinamičkog niza, treba imati u vidu da je u stablu nizova u svakom trenutku potrebno dodatni niz, tj. koren stabla, veličine $O(\sqrt{size})$.
 
 \section{Eksperimentalno merenje performansi}
 
