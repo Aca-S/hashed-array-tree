@@ -28,7 +28,7 @@
 \maketitle
 
 \begin{abstract}
-
+Dinamički niz predstavlja verovatno najkorišćeniju strukturu podataka u velikom broju realnih softverskih sistema, te je od velike važnosti pružanje njegove efikasne i jednostavne za upotrebu implementacije kroz standardne biblioteke programskih jezika - \verb|std::vector| u programskom jeziku \verb|C++|, \verb|ArrayList| u programskom jeziku \verb|Java| i drugi. Jedan od problema u većini ovih implementacija je količina alocirane, ali neiskorišćene memorije kojom se omogućava efikasnost osnovnih operacija. Struktura \verb|Hashed Array Tree|, koja će biti detaljno opisana u nastavku ovog rada, zadržava efikasnost osnovnih operacija dinamičkog niza, pritom smanjujući stepen neiskorišćenosti alocirane memorije.
 \end{abstract}
 
 \tableofcontents
@@ -45,7 +45,7 @@ Da bi se obezbedio što manji broj realokacija niza, potrebno je izabrati odgova
 
 Problem sa prethodnim pristupom je u proseku velika količina neiskorišćene, ali alocirane memorije. Malo detaljnijom analizom može se pokazati da je u najgorem slučaju vrednost razlike kapaciteta i stvarnog broja elemenata, $capacity - size$ jednaka $O(size)$ ukoliko se primenjuje prethodno opisana strategija uvećavanja kapaciteta. Edvard Sitarski je 1996. godine opisao strukturu podataka koju je nazvao \verb|Hashed Array Tree|, ili u slobodnom prevodu stablo nizova, koja zadržava vremenske složenosti osnovnih operacija kao u standardnoj implementaciji dinamičkog niza, ali smanjuje količinu neiskorišćene memorije na $O(\sqrt{size})$ \cite{hat-sitarski}.
 
-U nastavku ovog rada će biti opisana struktura stabla nizova i sprovedena analiza vremenske složenosti njenih osnovnih operacija, kao i memorijske složenosti. Dodatno, biće prikazana uporedna merenja performansi ove strukture implementirane u programskom jeziku \verb|C++| sa implementacijom dinamičkog vektora iz standardne biblioteke ovog jezika, \verb|std::vector<T, Allocator>|.
+U nastavku ovog rada će biti opisana struktura stabla nizova i sprovedena analiza vremenske složenosti njenih osnovnih operacija, kao i memorijske složenosti. Dodatno, biće prikazana uporedna merenja performansi ove strukture implementirane u programskom jeziku \verb|C++| sa implementacijom dinamičkog niza iz standardne biblioteke ovog jezika, \verb|std::vector<T, Allocator>|.
 
 \section{Opis strukture}
 
@@ -210,6 +210,8 @@ Rezultati su prikazani na slici \ref{fig:benchmarks-pb-sort}. Kao što je i oče
 \end{figure}
 
 \section{Zaključak}
+
+Stablo nizova, kao alternativni način implementacije kolekcije dinamičkog niza, omogućava nezanemarljivo veći stepen iskorišćenosti alociranog memorijskog prostora, što ga čini izuzetno pogodnim za upotrebu u sistemima sa ograničenom memorijom, poput ugrađenih sistema (eng. \textit{embedded system}). Gubitak u performansama osnovnih operacija, iako postoji, je zanemarljiv za većinu slučajeva upotrebe.
 
 \addcontentsline{toc}{section}{Literatura}
 \appendix
