@@ -1,0 +1,15 @@
+hat_vector - push_back_and_sort:
+n = 1000, time = 0.00016036s
+n = 10000, time = 0.00208267s
+n = 100000, time = 0.0258267s
+n = 1000000, time = 0.320089s
+n = 10000000, time = 3.80586s
+n = 100000000, time = 43.7231s
+
+std::vector - push_back_and_sort:
+n = 1000, time = 0.000133749s
+n = 10000, time = 0.00167378s
+n = 100000, time = 0.0204271s
+n = 1000000, time = 0.236498s
+n = 10000000, time = 2.73454s
+n = 100000000, time = 32.0964s
