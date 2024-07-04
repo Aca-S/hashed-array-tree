@@ -62,7 +62,7 @@ Za razliku od standardnih dinamičkih nizova, gde je sva alocirana memorija u je
 
 Za potrebe implementacije osnovnih operacija nad ovom strukturom (umetanje elemenata, brisanje elemenata, indeksni pristup elementima), pored samih pokazivača potrebno je održavati i vrednosti koje predstavljaju trenutni broj elemenata, trenutni kapacitet (jednak sumi veličina alociranih korpi) i trenutni stepen stabla nizova, tj. broj $p$ takav da je veličina korpi jednaka $m = 2^p$. Osnovna struktura je prikazana u listingu \ref{lst:osnovna-struktura}.
 
-U ostatku rada, stablo nizova će biti implementirano u programskom jeziku \verb|C++| u vidu klase \verb|hat_vector<T, Allocator>|. Svi kodovi će biti predstavljeni u pojednostavljenoj formi radi jednostavnije analize, a kompletna implementacija se može naći na \url{https://github.com/Aca-S/hashed-array-tree/}.
+U ostatku rada, stablo nizova će biti implementirano u programskom jeziku \verb|C++| u vidu klase \verb|hat_vector<T, Allocator>| \cite{hat-implementation}. Svi kodovi će biti predstavljeni u pojednostavljenoj formi radi jednostavnije analize, a kompletna implementacija se može naći na \url{https://github.com/Aca-S/hashed-array-tree/}.
 
 \begin{lstlisting}[language=C++, caption={Osnovna struktura stabla nizova}, captionpos=b, label={lst:osnovna-struktura}]
 template <typename T, typename Allocator>
