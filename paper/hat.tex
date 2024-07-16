@@ -28,7 +28,7 @@
 \maketitle
 
 \begin{abstract}
-Dinamički niz predstavlja verovatno najkorišćeniju strukturu podataka u velikom broju realnih softverskih sistema, te je od velike važnosti pružanje njegove efikasne i jednostavne za upotrebu implementacije kroz standardne biblioteke programskih jezika - \verb|std::vector| u programskom jeziku \verb|C++|, \verb|ArrayList| u programskom jeziku \verb|Java| i drugi. Jedan od problema u većini ovih implementacija je količina alocirane, ali neiskorišćene memorije kojom se omogućava efikasnost osnovnih operacija. Struktura \verb|Hashed Array Tree|, koja će biti detaljno opisana u nastavku ovog rada, zadržava efikasnost osnovnih operacija dinamičkog niza, pritom smanjujući stepen neiskorišćenosti alocirane memorije.
+Dinamički niz predstavlja verovatno najkorišćeniju strukturu podataka u implementaciji velikog broja softverskih sistema, te je od velike važnosti pružanje njegove efikasne i jednostavne za upotrebu implementacije kroz standardne biblioteke programskih jezika - \verb|std::vector| u programskom jeziku \verb|C++|, \verb|ArrayList| u programskom jeziku \verb|Java| i drugi. Jedan od problema u većini ovih implementacija je količina alocirane, ali neiskorišćene memorije. Struktura \verb|Hashed Array Tree|, koja će biti detaljno opisana u nastavku ovog rada, zadržava efikasnost osnovnih operacija dinamičkog niza, pritom smanjujući stepen neiskorišćenosti alocirane memorije.
 \end{abstract}
 
 \tableofcontents
@@ -154,7 +154,7 @@ Ukoliko za ukupnu cenu dodavanja $n + 1$ elemenata uzmemo zbir broja kopiranja i
 
 \subsection{Umetanje elementa na proizvoljnu poziciju}
 
-Za razliku od operacije dodavanja elementa na kraj, umetanje elementa na proizvoljnu poziciju nema amortizovanu vremensku složenost $O(1)$. Pre svega, ukoliko se dodavanjem novog elementa prekoračuje trenutni kapacitet stabla nizova, potrebno je izvršiti alokaciju dodatnog prostora na isti način kao u slučaju dodavanja elementa na kraj. Nakon toga, elementi počev od poslednjeg, pa sve do onog na poziciji umetanja novog elementa, se kopiraju za jednu poziciju \textit{udesno}, što može zahtevati i njihovo kopiranje u korpu različitu od one u kojoj su se nalazili pre umetanja novog elementa. Ovaj postupak u najgorem slučaju (pri umetanju na sam početak stabla nizova), zahteva $n$ kopiranja, gde je $n$ broj sadržanih elemenata. Konačno, na lokaciju indeksa umetanja se upisuje nova vrednost i veličina stabla nizova, tj. vrednost \verb|m_size| se uvećava.
+Za razliku od operacije dodavanja elementa na kraj, umetanje elementa na proizvoljnu poziciju nema amortizovanu vremensku složenost $O(1)$. Pre svega, ukoliko se dodavanjem novog elementa prekoračuje trenutni kapacitet stabla nizova, potrebno je izvršiti alokaciju dodatnog prostora na isti način kao u slučaju dodavanja elementa na kraj. Nakon toga se elementi, počev od poslednjeg, pa sve do onog na poziciji umetanja novog elementa, kopiraju za jednu poziciju \textit{udesno}, što može zahtevati i njihovo kopiranje u korpu različitu od one u kojoj su se nalazili pre umetanja novog elementa. Ovaj postupak u najgorem slučaju (pri umetanju na sam početak stabla nizova), zahteva $n$ kopiranja, gde je $n$ broj sadržanih elemenata. Konačno, na lokaciju indeksa umetanja se upisuje nova vrednost i veličina stabla nizova, tj. vrednost \verb|m_size| se uvećava.
 
 \subsection{Brisanje elementa sa proizvoljne pozicije}
 
@@ -195,7 +195,7 @@ Ovaj zaključak je prikazan i na slici \ref{fig:cap-size-razlika} za popunjenost
 
 U ovom poglavlju će biti izmerene performanse implementirane kolekcije zasnovane na stablu nizova, \verb|hat_vector|, u odnosu na kolekciju vektora iz standardne biblioteke programskog jezika \verb|C++|, \verb|std::vector|. Eksperiment podrazumeva dodavanje određenog broja uniformno raspodeljenih \verb|int| brojeva na kraj kolekcije metodom \verb|push_back|, nakon čega se ta kolekcija sortira rastuće pozivom funkcije iz standardne biblioteke \verb|std::sort|. Sličan eksperiment je izveo i Edvard Sitarski u radu u kojem je predstavio ovu strukturu podataka \cite{hat-sitarski}.
 
-Rezultati su prikazani na slici \ref{fig:benchmarks-pb-sort}. Kao što je i očekivano, izvršavanje traje malo duže u slučaju \verb|hat_vector| kolekcije usled dva nivoa indirekcije prilikom pristupa traženom elementu. Razlika je oko 11.6 sekundi za 100 000 000 elemenata, ali je iskorišćenost memorije oko 723MB naspram oko 1024MB. Eksperimenti su izvršeni na \verb|AMD Ryzen 7 7730U| procesoru.
+Rezultati su prikazani na slici \ref{fig:benchmarks-pb-sort}. Kao što je i očekivano, izvršavanje traje malo duže u slučaju \verb|hat_vector| kolekcije usled dva nivoa indirekcije prilikom pristupa traženom elementu. Razlika je oko 11.6 sekundi za 100 000 000 elemenata, ali je iskorišćenost memorije oko 723MB naspram oko 1024MB. Eksperimenti su izvršeni sa \verb|AMD Ryzen 7 7730U| procesorom i 32GB \verb|RAM| memorije.
 
 \begin{figure}[h!]
     \centering
@@ -215,7 +215,7 @@ Stablo nizova, kao alternativni način implementacije kolekcije dinamičkog niza
 
 \addcontentsline{toc}{section}{Literatura}
 \appendix
-\bibliography{literatura} 
+\bibliography{literatura}
 \bibliographystyle{plain}
 
 \end{document}
