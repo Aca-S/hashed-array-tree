@@ -16,7 +16,6 @@
 \usepackage[unicode]{hyperref}
 \hypersetup{colorlinks,citecolor=green,filecolor=green,linkcolor=blue,urlcolor=blue}
 
-
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lema}
 
@@ -58,9 +57,11 @@ Stablo nizova je organizovano u dva nivoa. Prvi nivo, tj. koren stabla, je niz p
     \label{fig:hat-struktura-primer}
 \end{figure}
 
+Iz ovakve strukture se vidi i motivacija iza imena \verb|Hashed Array Tree|. Naime, ona dosta podseća na strukturu heš tabele sa strategijom razrešavanja kolizija ulančavanjem, gde bi prvi nivo, tj. koren stabla, odgovarao rečniku ključeva, pri čemu bi ključevi bili sami indeksi elemenata, a korpe kolizionim listama koje sadrže vrednosti. U tom kontekstu, heš funkcija bi vršila preslikavanje indeksa u njegov količnik sa veličinom nizova $m$.
+
 Za razliku od standardnih dinamičkih nizova, gde je sva alocirana memorija u jednom neprekidnom bloku, stablo nizova memoriju alocira u segmentima određene veličine. Iako ovaj pristup potencijalno kvari lokalnost referenci u \enquote{tačkama prekida} niza i uvodi dodatan nivo indirekcije pri pristupu elementima, on će omogućiti poboljšano iskorišćenje alocirane memorije.
 
-Za potrebe implementacije osnovnih operacija nad ovom strukturom (umetanje elemenata, brisanje elemenata, indeksni pristup elementima), pored samih pokazivača potrebno je održavati i vrednosti koje predstavljaju trenutni broj elemenata, trenutni kapacitet (jednak sumi veličina alociranih korpi) i trenutni stepen stabla nizova, tj. broj $p$ takav da je veličina korpi jednaka $m = 2^p$. Osnovna struktura je prikazana u listingu \ref{lst:osnovna-struktura}.
+Za potrebe implementacije osnovnih operacija nad ovom strukturom (umetanje elemenata, brisanje elemenata, indeksni pristup elementima), pored samih pokazivača potrebno je održavati i vrednosti koje predstavljaju trenutni broj elemenata, trenutni kapacitet (jednak sumi veličina alociranih korpi) i trenutni stepen stabla nizova, tj. broj $p$ takav da je veličina korpi jednaka $m = 2^p$. Veličina korpi se onda, kada je to potrebno, može dobiti iz stepena stabla, tj. kao \verb|m = 1 << p|. Osnovna struktura je prikazana u listingu \ref{lst:osnovna-struktura}.
 
 U ostatku rada, stablo nizova će biti implementirano u programskom jeziku \verb|C++| u vidu klase \verb|hat_vector<T, Allocator>| \cite{hat-implementation}. Svi kodovi će biti predstavljeni u pojednostavljenoj formi radi jednostavnije analize, a kompletna implementacija se može naći na \url{https://github.com/Aca-S/hashed-array-tree/}.
 
@@ -197,7 +198,7 @@ U ovom poglavlju će biti izmerene performanse implementirane kolekcije zasnovan
 
 Rezultati su prikazani na slici \ref{fig:benchmarks-pb-sort}. Kao što je i očekivano, izvršavanje traje malo duže u slučaju \verb|hat_vector| kolekcije usled dva nivoa indirekcije prilikom pristupa traženom elementu. Razlika je oko 11.6 sekundi za 100 000 000 elemenata, ali je iskorišćenost memorije oko 723MB naspram oko 1024MB. Eksperimenti su izvršeni sa \verb|AMD Ryzen 7 7730U| procesorom i 32GB \verb|RAM| memorije.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
     \centering
     \subfigure[]{
         \includegraphics[width=0.47\textwidth]{ilustracije/benchmarks-push-back-sort-vreme.png}
