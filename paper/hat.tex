@@ -57,7 +57,7 @@ Stablo nizova je organizovano u dva nivoa. Prvi nivo, tj. koren stabla, je niz p
     \label{fig:hat-struktura-primer}
 \end{figure}
 
-Iz ovakve strukture se vidi i motivacija iza imena \verb|Hashed Array Tree|. Naime, ona dosta podseća na strukturu heš tabele sa strategijom razrešavanja kolizija ulančavanjem, gde bi prvi nivo, tj. koren stabla, odgovarao rečniku ključeva, pri čemu bi ključevi bili sami indeksi elemenata, a korpe kolizionim listama koje sadrže vrednosti. U tom kontekstu, heš funkcija bi vršila preslikavanje indeksa u njegov količnik sa veličinom nizova $m$.
+Iz ovakve strukture se vidi i motivacija iza naziva \verb|Hashed Array Tree|. Naime, ona dosta podseća na strukturu heš tabele sa strategijom razrešavanja kolizija ulančavanjem, gde bi prvi nivo, tj. koren stabla, odgovarao rečniku ključeva, pri čemu bi ključevi bili sami indeksi elemenata, a korpe kolizionim listama koje sadrže vrednosti. U tom kontekstu, heš funkcija bi vršila preslikavanje indeksa u njegov količnik sa veličinom nizova $m$.
 
 Za razliku od standardnih dinamičkih nizova, gde je sva alocirana memorija u jednom neprekidnom bloku, stablo nizova memoriju alocira u segmentima određene veličine. Iako ovaj pristup potencijalno kvari lokalnost referenci u \enquote{tačkama prekida} niza i uvodi dodatan nivo indirekcije pri pristupu elementima, on će omogućiti poboljšano iskorišćenje alocirane memorije.
 
@@ -108,12 +108,12 @@ U zavisnosti od trenutnog broja elemenata, kapaciteta i stepena stabla nizova, d
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.3\textwidth]{ilustracije/dodavanje-na-kraj-primer-1.png}
+    \includegraphics[width=0.28\textwidth]{ilustracije/dodavanje-na-kraj-primer-1.png}
     \caption{Puno stablo nizova stepena 1, tj. maksimalnog mogućeg kapaciteta 4}
     \label{fig:dodavanje-na-kraj-primer-pocetak}
 \end{figure}
 
-Ovo stablo je dostiglo maksimalan broj elemenata za svoj stepen, u ovom slučaju 4. Samo alociranje nove korpe nije moguće, pa je iz tog razloga prvo potrebno uvećati stepen stabla i time udvostručiti veličinu korena i korpi. Ovo se sprovodi alokacijom novog memorijskog prostora i kopiranjem svih elemenata iz starog stabla u novo stablo, stepena većeg za jedan. Novodobijeno stablo nizova za ovaj primer prikazano je na slici \ref{fig:dodavanje-na-kraj-primer-postupak} (a).
+Ovo stablo je dostiglo maksimalan broj elemenata za svoj stepen, u ovom slučaju 4. Samo alociranje nove korpe nije moguće, pa je iz tog razloga prvo potrebno inkrementirati stepen stabla $p$ i time udvostručiti veličinu korena i korpi $m$, što sledi iz veze $m = 2^p$. Ovo se sprovodi alokacijom novog memorijskog prostora i kopiranjem svih elemenata iz starog stabla u novo stablo, stepena većeg za jedan. Novodobijeno stablo nizova za ovaj primer prikazano je na slici \ref{fig:dodavanje-na-kraj-primer-postupak} (a).
 
 Po uvećanju stepena stabla nizova sa $p$ na $p + 1$, broj alociranih korpi u novom stablu biće jednak količniku broja elemenata u punom stablu stepena $p$ i veličine korpe u stablu stepena $p + 1$, tj. $\frac{2^{2p}}{2^{p + 1}} = 2^{p - 1}$. S obzirom na to da je ovaj količnik ceo broj, sve korpe dobijene uvećanjem stepena stabla biće popunjene do kraja, te je potrebno alocirati još jednu korpu za potrebe skladištenja elementa koji se dodaje na kraj, u ovom slučaju broja 4 - prikazano na slikama \ref{fig:dodavanje-na-kraj-primer-postupak} (b) i (c).
 
